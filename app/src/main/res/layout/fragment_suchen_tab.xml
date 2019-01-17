@@ -21,13 +21,19 @@
         android:layout_below="@id/title"
         android:hint="enter your text search here"
         />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/select_title"
+        android:layout_below="@id/search_input"/>
     <Switch
         android:id="@+id/simpleSwitchGoogle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Google"
         android:checked="true"
-        android:layout_below="@id/search_input"
+        android:layout_below="@id/select_title"
         android:gravity="left"/>
     <Switch
         android:id="@+id/simpleSwitchFlickr"
@@ -35,7 +41,7 @@
         android:layout_height="wrap_content"
         android:text="Flickr"
         android:checked="true"
-        android:layout_below="@id/search_input"
+        android:layout_below="@id/simpleSwitchGoogle"
         android:gravity="left"/>
     <Switch
         android:id="@+id/simpleSwitchGetty"
@@ -43,8 +49,14 @@
         android:layout_height="wrap_content"
         android:text="Getty"
         android:checked="true"
-        android:layout_below="@id/search_input"
+        android:layout_below="@id/simpleSwitchFlickr"
         android:gravity="left"/>
+    <android.support.v7.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SEARCH"
+        android:id="@+id/search_button"
+        android:layout_below="@id/simpleSwitchGetty"/>
 
 </RelativeLayout>
 </FrameLayout>
