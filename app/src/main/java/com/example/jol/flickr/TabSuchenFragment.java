@@ -12,6 +12,18 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import cz.msebera.android.httpclient.Header;
+
 public class TabSuchenFragment extends Fragment {
 
     String searchText;
@@ -39,9 +51,19 @@ public class TabSuchenFragment extends Fragment {
                         searchMachine = "flickr";
                     }
                 }
+                callApi();
             }
         });
         return view;
+    }
+
+    private void callApi() {
+        FlickrRestResponseHandler responseHandler = new FlickrRestResponseHandler();
+        try {
+            responseHandler.getFlickrImages();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

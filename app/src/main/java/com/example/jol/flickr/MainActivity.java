@@ -17,11 +17,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setTitle("Bildersuche");
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        initializeViewElements();
+    }
+
+    private void initializeViewElements() {
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText(R.string.tabItem1));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.tabItem2));
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        final ViewPager viewPager = findViewById(R.id.pager);
         PagerViewAdapter adapter = new PagerViewAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
