@@ -1,4 +1,5 @@
 *.iml
+app/src/main/res/values/secrets.xml
 .gradle
 .idea
 /local.properties

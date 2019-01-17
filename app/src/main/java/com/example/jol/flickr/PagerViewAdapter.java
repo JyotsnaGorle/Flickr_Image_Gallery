@@ -4,11 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.jol.flickr.TabFavouritesFragment;
-import com.example.jol.flickr.TabSuchenFragment;
-
 public class PagerViewAdapter extends FragmentStatePagerAdapter {
-    int numberOfTabs;
+    private int numberOfTabs;
 
     public PagerViewAdapter(FragmentManager fragmentManager, int numberOfTabs) {
         super(fragmentManager);
@@ -19,11 +16,9 @@ public class PagerViewAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                TabSuchenFragment tabSuchenFragment = new TabSuchenFragment();
-                return tabSuchenFragment;
+                return new TabSuchenFragment();
             case 1:
-                TabFavouritesFragment tabFavouritesFragment = new TabFavouritesFragment();
-                return tabFavouritesFragment;
+                return new TabFavouritesFragment();
             default:
                 return null;
         }

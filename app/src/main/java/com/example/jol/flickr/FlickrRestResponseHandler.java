@@ -1,5 +1,7 @@
 package com.example.jol.flickr;
 
+import android.content.Context;
+
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -10,12 +12,12 @@ import java.io.IOException;
 import cz.msebera.android.httpclient.Header;
 
 public class FlickrRestResponseHandler {
-    public void getFlickrImages() throws IOException {
+    public void getFlickrImages(Context context, String searchText) throws IOException {
         RequestParams params = new RequestParams();
         params.put("method", "flickr.photos.search");
-        params.put("api_key", "766733a614a9c15a873ac2b130ef2db7");
+        params.put("api_key", context.getString(R.string.api_key));
         params.put("format", "json");
-        params.put("text", "cat");
+        params.put("text", searchText);
         params.put("nojsoncallback", "1");
 
         FlickrRestClient.get("",params, new JsonHttpResponseHandler(){
