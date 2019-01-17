@@ -5,6 +5,7 @@ import android.content.Context;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -24,6 +25,16 @@ public class FlickrRestResponseHandler {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                try {
+
+                    String status = String.valueOf(response.get("stat"));
+                    if (!("ok".equals(status))) {
+                        return;
+                    }
+                    handleJSONResponse((JSONObject) response.get("photos"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -31,5 +42,9 @@ public class FlickrRestResponseHandler {
                 super.onFailure(statusCode, headers, responseString, throwable);
             }
         });
+    }
+
+    private void handleJSONResponse(JSONObject response) {
+        System.out.print(response);
     }
 }
