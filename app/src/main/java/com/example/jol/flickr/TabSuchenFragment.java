@@ -3,11 +3,14 @@ package com.example.jol.flickr;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -18,6 +21,9 @@ public class TabSuchenFragment extends Fragment {
     String searchText;
     SearchMachine searchMachine;
     EditText searchTextInput;
+    GridView gridView;
+
+    PhotosResponse photosResponse;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -29,12 +35,12 @@ public class TabSuchenFragment extends Fragment {
     private View initializeViewElements(final View view) {
         TextView title = view.findViewById(R.id.title);
         title.setText(getString(R.string.suche_title));
+        gridView = view.findViewById(R.id.photo_grid);
 
         searchTextInput = view.findViewById(R.id.search_input);
         Button searchButton = view.findViewById(R.id.search_button);
 
         handleButtonClick(searchButton, view);
-
         return view;
     }
 
@@ -60,7 +66,15 @@ public class TabSuchenFragment extends Fragment {
             case FLICKR:
                 FlickrRestResponseHandler responseHandler = new FlickrRestResponseHandler();
                 try {
-                    responseHandler.getFlickrImages(this.getContext(), searchText);
+                    responseHandler.getFlickrImages(this.getContext(), searchText, new PhotosResponse() {
+                        @Override
+                        public void onResponseReceived(Photos allPhotos) {
+                            Log.d("photos", String.valueOf(allPhotos));
+                            if (allPhotos.photo != null && allPhotos.photo.size() > 0) {
+                                populatePhotos(allPhotos);
+                            }
+                        }
+                    });
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -75,4 +89,11 @@ public class TabSuchenFragment extends Fragment {
 
     }
 
+    private void populatePhotos(Photos allPhotos) {
+        FragmentActivity fragmentActivity = this.getActivity();
+        if(fragmentActivity != null) {
+            PhotoGridAdapter adapter = new PhotoGridAdapter(fragmentActivity, allPhotos.photo);
+            gridView.setAdapter(adapter);
+        }
+    }
 }

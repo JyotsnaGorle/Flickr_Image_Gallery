@@ -57,6 +57,13 @@
         android:text="SEARCH"
         android:id="@+id/search_button"
         android:layout_below="@id/simpleSwitchGetty"/>
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="3"
+        android:id="@+id/photo_grid"
+        android:layout_below="@id/search_button">
+    </GridView>
 
 </RelativeLayout>
 </FrameLayout>

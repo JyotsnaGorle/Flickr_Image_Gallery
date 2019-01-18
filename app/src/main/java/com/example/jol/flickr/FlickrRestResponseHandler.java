@@ -1,7 +1,9 @@
 package com.example.jol.flickr;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -13,7 +15,9 @@ import java.io.IOException;
 import cz.msebera.android.httpclient.Header;
 
 public class FlickrRestResponseHandler {
-    public void getFlickrImages(Context context, String searchText) throws IOException {
+    private Photos allPhotos;
+
+    public void getFlickrImages(Context context, String searchText, final PhotosResponse photosResponse) throws IOException {
         RequestParams params = new RequestParams();
         params.put("method", "flickr.photos.search");
         params.put("api_key", context.getString(R.string.api_key));
@@ -21,17 +25,17 @@ public class FlickrRestResponseHandler {
         params.put("text", searchText);
         params.put("nojsoncallback", "1");
 
+
         FlickrRestClient.get("",params, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
                 try {
-
                     String status = String.valueOf(response.get("stat"));
                     if (!("ok".equals(status))) {
                         return;
                     }
-                    handleJSONResponse((JSONObject) response.get("photos"));
+                    Photos allPhotos = new Gson().fromJson(response.get("photos").toString(),Photos.class);
+                    photosResponse.onResponseReceived(allPhotos);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -39,12 +43,8 @@ public class FlickrRestResponseHandler {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
+                Log.e("response failure", String.valueOf(statusCode));
             }
         });
-    }
-
-    private void handleJSONResponse(JSONObject response) {
-        System.out.print(response);
     }
 }
