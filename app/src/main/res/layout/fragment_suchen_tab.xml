@@ -11,12 +11,15 @@
     <android.support.v7.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:id="@+id/title"/>
 
     <android.support.design.widget.TextInputEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:id="@+id/search_input"
         android:layout_below="@id/title"
         android:hint="enter your text search here"
@@ -27,40 +30,54 @@
         android:layout_height="wrap_content"
         android:id="@+id/select_title"
         android:layout_below="@id/search_input"/>
-    <Switch
-        android:id="@+id/simpleSwitchGoogle"
-        android:layout_width="fill_parent"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Google"
-        android:checked="true"
+        android:id="@+id/switches"
         android:layout_below="@id/select_title"
-        android:gravity="left"/>
-    <Switch
-        android:id="@+id/simpleSwitchFlickr"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Flickr"
-        android:checked="true"
-        android:layout_below="@id/simpleSwitchGoogle"
-        android:gravity="left"/>
-    <Switch
-        android:id="@+id/simpleSwitchGetty"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Getty"
-        android:checked="true"
-        android:layout_below="@id/simpleSwitchFlickr"
-        android:gravity="left"/>
+        android:padding="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+        <Switch
+            android:id="@+id/simpleSwitchGoogle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Google"
+            android:checked="false"
+            android:gravity="left"/>
+        <Switch
+            android:id="@+id/simpleSwitchFlickr"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Flickr"
+            android:checked="true"
+            android:layout_below="@id/simpleSwitchGoogle"
+            android:gravity="left"/>
+        <Switch
+            android:id="@+id/simpleSwitchGetty"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Getty"
+            android:checked="false"
+            android:layout_below="@id/simpleSwitchFlickr"
+            android:gravity="left"/>
+    </RelativeLayout>
+
     <android.support.v7.widget.AppCompatButton
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="SEARCH"
         android:id="@+id/search_button"
-        android:layout_below="@id/simpleSwitchGetty"/>
+        android:gravity="center"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/switches"/>
     <GridView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numColumns="3"
+        android:layout_marginTop="20dp"
         android:id="@+id/photo_grid_item"
         android:layout_below="@id/search_button">
     </GridView>
