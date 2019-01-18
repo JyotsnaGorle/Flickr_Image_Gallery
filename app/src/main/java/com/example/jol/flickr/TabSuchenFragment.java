@@ -35,7 +35,7 @@ public class TabSuchenFragment extends Fragment {
     private View initializeViewElements(final View view) {
         TextView title = view.findViewById(R.id.title);
         title.setText(getString(R.string.suche_title));
-        gridView = view.findViewById(R.id.photo_grid);
+        gridView = view.findViewById(R.id.photo_grid_item);
 
         searchTextInput = view.findViewById(R.id.search_input);
         Button searchButton = view.findViewById(R.id.search_button);

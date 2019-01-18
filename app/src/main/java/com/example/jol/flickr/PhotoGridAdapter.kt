@@ -21,9 +21,10 @@ class PhotoGridAdapter(context: Context, var itemList: ArrayList<PhotoData>) : B
         val inflator = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val itemView = inflator.inflate(R.layout.photo_grid_cell, null)
 
-        itemView.findViewById<TextView>(R.id.photo_name).text = item.title
-//        val imageView = itemView.findViewById<ImageView>(R.id.photo_cell)
-//        DownloadPhotoTask(imageView).execute(constructURLForPhotoItem(item))
+        val imageView = itemView.findViewById<ImageView>(R.id.imgItem)
+        imageView.let {
+            DownloadPhotoTask(imageView).execute(constructURLForPhotoItem(item))
+        }
         return itemView
     }
 
@@ -47,6 +48,6 @@ class PhotoGridAdapter(context: Context, var itemList: ArrayList<PhotoData>) : B
 
     override fun getItemId(position: Int) = position.toLong()
 
-    override fun getCount() = itemList.size
+    override fun getCount() = itemList.size / 4
 
 }

@@ -7,7 +7,7 @@ import android.util.Log
 import android.widget.ImageView
 
 
-class DownloadPhotoTask(internal var bitMapImage: ImageView) : AsyncTask<String, Void, Bitmap>() {
+class DownloadPhotoTask(internal var bitMapImage: ImageView?) : AsyncTask<String, Void, Bitmap>() {
 
     override fun doInBackground(vararg urls: String): Bitmap? {
         val urldisplay = urls[0]
@@ -23,6 +23,8 @@ class DownloadPhotoTask(internal var bitMapImage: ImageView) : AsyncTask<String,
     }
 
     override fun onPostExecute(result: Bitmap) {
-        bitMapImage.setImageBitmap(result)
+        val bmImage = bitMapImage?.let {
+            it.setImageBitmap(result)
+        }
     }
 }
