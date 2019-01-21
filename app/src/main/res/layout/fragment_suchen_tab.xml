@@ -22,6 +22,8 @@
             android:layout_marginRight="10dp"
             android:id="@+id/search_input"
             android:layout_below="@id/title"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
             android:hint="enter your text search here"
             />
 
@@ -30,7 +32,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/error_msg"
             android:textColor="#ff0000"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="12dp"
             android:textSize="9dp"
             android:layout_below="@id/search_input"/>
         <RelativeLayout
@@ -71,7 +73,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/error_msg_search_machines"
             android:textColor="#ff0000"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="12dp"
             android:textSize="9dp"
             android:layout_below="@id/switches"/>
 

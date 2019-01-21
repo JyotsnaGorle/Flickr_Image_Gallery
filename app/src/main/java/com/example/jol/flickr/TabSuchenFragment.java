@@ -1,6 +1,7 @@
 package com.example.jol.flickr;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -9,9 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -52,10 +56,14 @@ public class TabSuchenFragment extends Fragment {
         title.setText(getString(R.string.suche_title));
 
         recyclerView = view.findViewById(R.id.recyclerView);
-        searchTextInput = view.findViewById(R.id.search_input);
+
         loadingIndicatorView = view.findViewById(R.id.avi);
         errorText = view.findViewById(R.id.error_msg);
-        handleTextInputChange(searchTextInput);
+
+        searchTextInput = view.findViewById(R.id.search_input);
+        if(searchTextInput!=null) {
+            handleTextInputChange(view);
+        }
 
         noImageTextHolder = view.findViewById(R.id.no_images);
         Button searchButton = view.findViewById(R.id.search_button);
@@ -64,16 +72,8 @@ public class TabSuchenFragment extends Fragment {
         return view;
     }
 
-    private void handleTextInputChange(EditText searchTextInput) {
+    private void handleTextInputChange(final View view) {
         searchTextInput.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start,
-            int count, int after) {
-            }
 
             @Override
             public void onTextChanged(CharSequence s, int start,
@@ -84,6 +84,24 @@ public class TabSuchenFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                 }
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) { }
+        });
+
+        searchTextInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    Log.d(TAG, "onEditorAction: enter pressed");
+                    performSearch(view);
+                    return true;
+                }
+                return false;
+            }
         });
     }
 
@@ -92,34 +110,40 @@ public class TabSuchenFragment extends Fragment {
             @SuppressLint("ResourceType")
             @Override
             public void onClick(View v) {
-                searchText = searchTextInput.getText().toString();
-                if(!searchText.equals("")) {
-                    errorText.setVisibility(View.INVISIBLE);
-                    Switch flickrSwitch = view.findViewById(R.id.simpleSwitchFlickr);
-                    Switch googleSwitch = view.findViewById(R.id.simpleSwitchGoogle);
-                    Switch gettySwitch = view.findViewById(R.id.simpleSwitchGetty);
-                    if(flickrSwitch.isChecked()) {
-                        searchMachine = SearchMachine.FLICKR;
-                    }
-                    if(googleSwitch.isChecked() || gettySwitch.isChecked()) {
-                        TextView errorMessage = view.findViewById(R.id.error_msg_search_machines);
-                        errorMessage.setText(getString(com.example.jol.flickr.R.string.search_machine_error));
-                    }
-                    callApi();
-                }
-                else {
-                    resetView();
-                }
+                performSearch(view);
 
             }
         });
     }
 
-    private void resetView() {
-        if (errorText != null) {
-            errorText.setText(getString(com.example.jol.flickr.R.string.search_input_error_msg));
-            errorText.setVisibility(View.VISIBLE);
+    private void performSearch(View view) {
+        resetView();
+        searchText = searchTextInput.getText().toString();
+        hideKeyboard(getActivity());
+        if(!searchText.equals("")) {
+            errorText.setVisibility(View.INVISIBLE);
+            Switch flickrSwitch = view.findViewById(R.id.simpleSwitchFlickr);
+            Switch googleSwitch = view.findViewById(R.id.simpleSwitchGoogle);
+            Switch gettySwitch = view.findViewById(R.id.simpleSwitchGetty);
+            if(flickrSwitch.isChecked()) {
+                searchMachine = SearchMachine.FLICKR;
+            }
+            if(googleSwitch.isChecked() || gettySwitch.isChecked()) {
+                TextView errorMessage = view.findViewById(R.id.error_msg_search_machines);
+                errorMessage.setText(getString(R.string.search_machine_error));
+            }
+            callApi();
         }
+        else {
+            if (errorText != null) {
+                errorText.setText(getString(com.example.jol.flickr.R.string.search_input_error_msg));
+                errorText.setVisibility(View.VISIBLE);
+            }
+            resetView();
+        }
+    }
+
+    private void resetView() {
         if(adapter != null) {
             shortListPhotos.clear();
             adapter.notifyDataSetChanged();
@@ -202,11 +226,20 @@ public class TabSuchenFragment extends Fragment {
 
     private void onScrolledToBottom() {
         int currentSize = shortListPhotos.size();
-        if(currentSize < allPhotos.size()) {
+        if(currentSize < allPhotos.size() - 9) {
             for(int i = currentSize; i< currentSize + 9; i++) {
                 shortListPhotos.add(allPhotos.get(i));
             }
         }
         adapter.notifyDataSetChanged();
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        View view = activity.getCurrentFocus();
+        if (view == null) {
+            view = new View(activity);
+        }
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
