@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -24,10 +23,8 @@ public class TabSuchenFragment extends Fragment {
     String searchText;
     SearchMachine searchMachine;
     EditText searchTextInput;
-    GridView gridView;
 
     RecyclerView recyclerView;
-    PhotosResponse photosResponse;
     PhotoRecyclerViewAdapter adapter;
 
     ArrayList<PhotoData> allPhotos = new ArrayList<PhotoData>();
@@ -43,7 +40,6 @@ public class TabSuchenFragment extends Fragment {
     private View initializeViewElements(final View view) {
         TextView title = view.findViewById(R.id.title);
         title.setText(getString(R.string.suche_title));
-//        gridView = view.findViewById(R.id.photo_grid_item);
 
         recyclerView = view.findViewById(R.id.recyclerView);
         searchTextInput = view.findViewById(R.id.search_input);
@@ -66,8 +62,21 @@ public class TabSuchenFragment extends Fragment {
                     }
                     callApi();
                 }
+                else {
+                    resetView(view);
+                }
+
             }
         });
+    }
+
+    private void resetView(View view) {
+        TextView errorText = view.findViewById(R.id.error_msg);
+        errorText.setText(getString(com.example.jol.flickr.R.string.search_input_error_msg));
+        if(adapter != null) {
+            shortListPhotos.clear();
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private void callApi() {
