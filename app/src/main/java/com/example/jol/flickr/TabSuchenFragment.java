@@ -17,6 +17,8 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.wang.avi.AVLoadingIndicatorView;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -27,10 +29,13 @@ public class TabSuchenFragment extends Fragment {
     String searchText;
     SearchMachine searchMachine;
     EditText searchTextInput;
+    TextView errorText;
 
     TextView noImageTextHolder;
     RecyclerView recyclerView;
     PhotoRecyclerViewAdapter adapter;
+
+    AVLoadingIndicatorView loadingIndicatorView;
 
     ArrayList<PhotoData> allPhotos = new ArrayList<PhotoData>();
     ArrayList<PhotoData> shortListPhotos = new ArrayList<PhotoData>();
@@ -48,7 +53,8 @@ public class TabSuchenFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerView);
         searchTextInput = view.findViewById(R.id.search_input);
-
+        loadingIndicatorView = view.findViewById(R.id.avi);
+        errorText = view.findViewById(R.id.error_msg);
         handleTextInputChange(searchTextInput);
 
         noImageTextHolder = view.findViewById(R.id.no_images);
@@ -77,7 +83,6 @@ public class TabSuchenFragment extends Fragment {
                     shortListPhotos.clear();
                     adapter.notifyDataSetChanged();
                 }
-
             }
         });
     }
@@ -89,6 +94,7 @@ public class TabSuchenFragment extends Fragment {
             public void onClick(View v) {
                 searchText = searchTextInput.getText().toString();
                 if(!searchText.equals("")) {
+                    errorText.setVisibility(View.INVISIBLE);
                     Switch flickrSwitch = view.findViewById(R.id.simpleSwitchFlickr);
                     Switch googleSwitch = view.findViewById(R.id.simpleSwitchGoogle);
                     Switch gettySwitch = view.findViewById(R.id.simpleSwitchGetty);
@@ -99,26 +105,28 @@ public class TabSuchenFragment extends Fragment {
                         TextView errorMessage = view.findViewById(R.id.error_msg_search_machines);
                         errorMessage.setText(getString(com.example.jol.flickr.R.string.search_machine_error));
                     }
-                    callApi(view);
+                    callApi();
                 }
                 else {
-                    resetView(view);
+                    resetView();
                 }
 
             }
         });
     }
 
-    private void resetView(View view) {
-        TextView errorText = view.findViewById(R.id.error_msg);
-        errorText.setText(getString(com.example.jol.flickr.R.string.search_input_error_msg));
+    private void resetView() {
+        if (errorText != null) {
+            errorText.setText(getString(com.example.jol.flickr.R.string.search_input_error_msg));
+            errorText.setVisibility(View.VISIBLE);
+        }
         if(adapter != null) {
             shortListPhotos.clear();
             adapter.notifyDataSetChanged();
         }
     }
 
-    private void callApi(final View view) {
+    private void callApi() {
         switch (searchMachine) {
             case FLICKR:
                 FlickrRestResponseHandler responseHandler = new FlickrRestResponseHandler();
@@ -136,7 +144,7 @@ public class TabSuchenFragment extends Fragment {
                                 if(noImageTextHolder != null) {
                                     noImageTextHolder.setText("No results");
                                 }
-                                recyclerView.setVisibility(view.INVISIBLE);
+                                recyclerView.setVisibility(View.INVISIBLE);
                             }
                         }
                     });
@@ -155,12 +163,11 @@ public class TabSuchenFragment extends Fragment {
     }
 
     private void startLoader(boolean state) {
-        if(noImageTextHolder != null) {
+        if(loadingIndicatorView != null) {
             if (state) {
-                noImageTextHolder.setText("LOADING results...");
+                loadingIndicatorView.show();
             } else {
-                noImageTextHolder.setText("");
-                noImageTextHolder.setVisibility(View.INVISIBLE);
+                loadingIndicatorView.hide();
             }
         }
     }

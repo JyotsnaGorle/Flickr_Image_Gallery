@@ -101,6 +101,18 @@
             android:gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:layout_below="@id/search_button"/>
+        <com.wang.avi.AVLoadingIndicatorView
+            android:id="@+id/avi"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            style="@style/AVLoadingIndicatorView"
+            android:visibility="gone"
+            app:indicatorName="BallPulseIndicator"
+            android:layout_below="@id/search_button"
+            android:layout_marginLeft="170dp"
+            app:indicatorColor="#1d70d6"
+        />
+
 
     </RelativeLayout>
 </FrameLayout>
