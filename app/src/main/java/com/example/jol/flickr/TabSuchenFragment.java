@@ -1,6 +1,9 @@
 package com.example.jol.flickr;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -41,8 +44,8 @@ public class TabSuchenFragment extends Fragment {
 
     AVLoadingIndicatorView loadingIndicatorView;
 
-    ArrayList<PhotoData> allPhotos = new ArrayList<PhotoData>();
-    ArrayList<PhotoData> shortListPhotos = new ArrayList<PhotoData>();
+    ArrayList<PhotoData> allPhotos = new ArrayList<>();
+    ArrayList<PhotoData> shortListPhotos = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -139,10 +142,10 @@ public class TabSuchenFragment extends Fragment {
         Switch gettySwitch = view.findViewById(R.id.simpleSwitchGetty);
         errorMessageSearchMachine = view.findViewById(R.id.error_msg_search_machines);
         if(!flickrSwitch.isChecked() && !googleSwitch.isChecked() && !gettySwitch.isChecked()) {
-            errorMessageSearchMachine.setText("turn on least one search engine");
+            AlertDialogManager.showAlert(getContext(), "Search Machine","turn on least one search engine");
         }
         else if(!flickrSwitch.isChecked()) {
-            errorMessageSearchMachine.setText("Please select Flickr as the other services are not available");
+            AlertDialogManager.showAlert(getContext(), "Search Machine","Please select Flickr as the other services are not available");
         }
         else if(flickrSwitch.isChecked()) {
             searchMachine = FLICKR;
@@ -166,8 +169,7 @@ public class TabSuchenFragment extends Fragment {
         if(hasConnection) {
             makeCall(searchMachine);
         } else {
-            Toast toast = Toast.makeText(getContext(),"NO INTERNET! Please check your connection and try again",Toast.LENGTH_LONG);
-            toast.show();
+            AlertDialogManager.showAlert(getContext(), "NO INTERNET!","Please check your connection and try again");
         }
 
     }
@@ -195,6 +197,7 @@ public class TabSuchenFragment extends Fragment {
                         }
                     });
                 } catch (IOException e) {
+                    startLoader(false);
                     e.printStackTrace();
                 }
                 break;
