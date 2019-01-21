@@ -66,6 +66,15 @@
                 android:gravity="left"/>
         </RelativeLayout>
 
+        <android.support.v7.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/error_msg_search_machines"
+            android:textColor="#ff0000"
+            android:layout_marginLeft="10dp"
+            android:textSize="9dp"
+            android:layout_below="@id/switches"/>
+
         <android.support.v7.widget.AppCompatButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,12 +84,22 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_centerInParent="true"
-            android:layout_below="@id/switches"/>
+            android:layout_below="@id/error_msg_search_machines"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/search_button"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/no_images"
+            android:textColor="#3b3a3a"
+            android:textSize="16dp"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="20dp"
             android:layout_below="@id/search_button"/>
 
     </RelativeLayout>

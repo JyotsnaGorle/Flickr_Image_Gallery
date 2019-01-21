@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,12 +20,15 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static android.support.constraint.Constraints.TAG;
+
 public class TabSuchenFragment extends Fragment {
 
     String searchText;
     SearchMachine searchMachine;
     EditText searchTextInput;
 
+    TextView noImageTextHolder;
     RecyclerView recyclerView;
     PhotoRecyclerViewAdapter adapter;
 
@@ -43,10 +48,38 @@ public class TabSuchenFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerView);
         searchTextInput = view.findViewById(R.id.search_input);
+
+        handleTextInputChange(searchTextInput);
+
+        noImageTextHolder = view.findViewById(R.id.no_images);
         Button searchButton = view.findViewById(R.id.search_button);
 
         handleButtonClick(searchButton, view);
         return view;
+    }
+
+    private void handleTextInputChange(EditText searchTextInput) {
+        searchTextInput.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+            int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+            int before, int count) {
+                if(s.length() == 0 && adapter != null) {
+                    Log.d(TAG, "onTextChanged: empty");
+                    shortListPhotos.clear();
+                    adapter.notifyDataSetChanged();
+                }
+
+            }
+        });
     }
 
     private void handleButtonClick(Button searchButton, final View view) {
@@ -57,10 +90,16 @@ public class TabSuchenFragment extends Fragment {
                 searchText = searchTextInput.getText().toString();
                 if(!searchText.equals("")) {
                     Switch flickrSwitch = view.findViewById(R.id.simpleSwitchFlickr);
+                    Switch googleSwitch = view.findViewById(R.id.simpleSwitchGoogle);
+                    Switch gettySwitch = view.findViewById(R.id.simpleSwitchGetty);
                     if(flickrSwitch.isChecked()) {
                         searchMachine = SearchMachine.FLICKR;
                     }
-                    callApi();
+                    if(googleSwitch.isChecked() || gettySwitch.isChecked()) {
+                        TextView errorMessage = view.findViewById(R.id.error_msg_search_machines);
+                        errorMessage.setText(getString(com.example.jol.flickr.R.string.search_machine_error));
+                    }
+                    callApi(view);
                 }
                 else {
                     resetView(view);
@@ -79,17 +118,25 @@ public class TabSuchenFragment extends Fragment {
         }
     }
 
-    private void callApi() {
+    private void callApi(final View view) {
         switch (searchMachine) {
             case FLICKR:
                 FlickrRestResponseHandler responseHandler = new FlickrRestResponseHandler();
                 try {
+                    startLoader(true);
                     responseHandler.getFlickrImages(this.getContext(), searchText, new PhotosResponse() {
                         @Override
                         public void onResponseReceived(Photos allPhotos) {
                             Log.d("photos", String.valueOf(allPhotos));
+                            startLoader(false);
                             if (allPhotos.photo != null && allPhotos.photo.size() > 0) {
                                 populatePhotos(allPhotos.photo);
+                            }
+                            else {
+                                if(noImageTextHolder != null) {
+                                    noImageTextHolder.setText("No results");
+                                }
+                                recyclerView.setVisibility(view.INVISIBLE);
                             }
                         }
                     });
@@ -107,6 +154,16 @@ public class TabSuchenFragment extends Fragment {
 
     }
 
+    private void startLoader(boolean state) {
+        if(noImageTextHolder != null) {
+            if (state) {
+                noImageTextHolder.setText("LOADING results...");
+            } else {
+                noImageTextHolder.setText("");
+                noImageTextHolder.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
     private void populatePhotos(ArrayList<PhotoData> allPhotos) {
 
         FragmentActivity fragmentActivity = this.getActivity();
