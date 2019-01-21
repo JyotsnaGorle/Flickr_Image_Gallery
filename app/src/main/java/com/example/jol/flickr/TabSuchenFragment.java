@@ -1,7 +1,6 @@
 package com.example.jol.flickr;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -15,11 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -27,14 +26,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static android.support.constraint.Constraints.TAG;
+import static com.example.jol.flickr.SearchMachine.FLICKR;
 
 public class TabSuchenFragment extends Fragment {
 
     String searchText;
-    SearchMachine searchMachine;
-    EditText searchTextInput;
-    TextView errorText;
 
+    EditText searchTextInput;
+
+    TextView errorMessageSearchMachine;
     TextView noImageTextHolder;
     RecyclerView recyclerView;
     PhotoRecyclerViewAdapter adapter;
@@ -58,7 +58,6 @@ public class TabSuchenFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
 
         loadingIndicatorView = view.findViewById(R.id.avi);
-        errorText = view.findViewById(R.id.error_msg);
 
         searchTextInput = view.findViewById(R.id.search_input);
         if(searchTextInput!=null) {
@@ -77,7 +76,7 @@ public class TabSuchenFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start,
-            int before, int count) {
+                                      int before, int count) {
                 if(s.length() == 0 && adapter != null) {
                     Log.d(TAG, "onTextChanged: empty");
                     shortListPhotos.clear();
@@ -119,38 +118,61 @@ public class TabSuchenFragment extends Fragment {
     private void performSearch(View view) {
         resetView();
         searchText = searchTextInput.getText().toString();
-        hideKeyboard(getActivity());
+        KeyboardManager.hideKeyboard(getActivity());
+        TextView errorText = view.findViewById(R.id.error_msg);
         if(!searchText.equals("")) {
             errorText.setVisibility(View.INVISIBLE);
-            Switch flickrSwitch = view.findViewById(R.id.simpleSwitchFlickr);
-            Switch googleSwitch = view.findViewById(R.id.simpleSwitchGoogle);
-            Switch gettySwitch = view.findViewById(R.id.simpleSwitchGetty);
-            if(flickrSwitch.isChecked()) {
-                searchMachine = SearchMachine.FLICKR;
-            }
-            if(googleSwitch.isChecked() || gettySwitch.isChecked()) {
-                TextView errorMessage = view.findViewById(R.id.error_msg_search_machines);
-                errorMessage.setText(getString(R.string.search_machine_error));
-            }
-            callApi();
+            SearchMachine searchMachine = setSearchMachine(view);
+            if(searchMachine != null)
+                callApi(searchMachine);
         }
-        else {
-            if (errorText != null) {
-                errorText.setText(getString(com.example.jol.flickr.R.string.search_input_error_msg));
-                errorText.setVisibility(View.VISIBLE);
-            }
-            resetView();
+        else if (errorText != null) {
+            errorText.setText(getString(com.example.jol.flickr.R.string.search_input_error_msg));
+            errorText.setVisibility(View.VISIBLE);
         }
     }
 
+    private SearchMachine setSearchMachine(View view) {
+        SearchMachine searchMachine = null;
+        Switch flickrSwitch = view.findViewById(R.id.simpleSwitchFlickr);
+        Switch googleSwitch = view.findViewById(R.id.simpleSwitchGoogle);
+        Switch gettySwitch = view.findViewById(R.id.simpleSwitchGetty);
+        errorMessageSearchMachine = view.findViewById(R.id.error_msg_search_machines);
+        if(!flickrSwitch.isChecked() && !googleSwitch.isChecked() && !gettySwitch.isChecked()) {
+            errorMessageSearchMachine.setText("turn on least one search engine");
+        }
+        else if(!flickrSwitch.isChecked()) {
+            errorMessageSearchMachine.setText("Please select Flickr as the other services are not available");
+        }
+        else if(flickrSwitch.isChecked()) {
+            searchMachine = FLICKR;
+            if(googleSwitch.isChecked() || gettySwitch.isChecked())
+                errorMessageSearchMachine.setText(getString(R.string.search_machine_error));
+        }
+        return searchMachine;
+    }
+
     private void resetView() {
+        if (errorMessageSearchMachine != null)
+            errorMessageSearchMachine.setText("");
         if(adapter != null) {
             shortListPhotos.clear();
             adapter.notifyDataSetChanged();
         }
     }
 
-    private void callApi() {
+    private void callApi(SearchMachine searchMachine) {
+        boolean hasConnection = InternetConnectivityManager.hasConnection(getContext());
+        if(hasConnection) {
+            makeCall(searchMachine);
+        } else {
+            Toast toast = Toast.makeText(getContext(),"NO INTERNET! Please check your connection and try again",Toast.LENGTH_LONG);
+            toast.show();
+        }
+
+    }
+
+    private void makeCall(SearchMachine searchMachine) {
         switch (searchMachine) {
             case FLICKR:
                 FlickrRestResponseHandler responseHandler = new FlickrRestResponseHandler();
@@ -183,7 +205,6 @@ public class TabSuchenFragment extends Fragment {
             default:
                 break;
         }
-
     }
 
     private void startLoader(boolean state) {
@@ -232,14 +253,5 @@ public class TabSuchenFragment extends Fragment {
             }
         }
         adapter.notifyDataSetChanged();
-    }
-
-    public static void hideKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        View view = activity.getCurrentFocus();
-        if (view == null) {
-            view = new View(activity);
-        }
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
